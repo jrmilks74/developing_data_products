@@ -1,0 +1,13 @@
+name: Interactive_Presentation
+title: Interactive_Presentation
+username:
+account: jrmilks
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4140719
+bundleId: 4605319
+url: https://jrmilks.shinyapps.io/Interactive_Presentation/
+when: 1621213171.52004
+lastSyncTime: 1621213171.52006
+asMultiple: FALSE
+asStatic: FALSE
