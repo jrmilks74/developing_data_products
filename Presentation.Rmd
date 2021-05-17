@@ -1,0 +1,95 @@
+---
+title: "Global temperature trends"
+author: "Jim Milks"
+date: "5/16/2021"
+output: ioslides_presentation
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(shiny)
+library(plotly)
+```
+
+## Shiny Presentation
+
+This R Markdown presentation is made interactive using Shiny. The viewers of the presentation can change the assumptions underlying what's presented and see the results immediately. 
+
+Global average temperature has risen since the 1850s. The Shiny app embedded in this presentation calculates the linear trend between the given start and end years and displays the temperature and trend on a graph. The data used is located at <https://www-users.york.ac.uk/~kdc3/papers/coverage2013/had4_krig_annual_v2_0_0.txt>
+
+## Cowtan-Way global average temperature
+
+
+```{r, CW}
+Cowtan_Way <- read.table("https://www-users.york.ac.uk/~kdc3/papers/coverage2013/had4_krig_annual_v2_0_0.txt", header = FALSE)
+names(Cowtan_Way) <- c("year", "temperature", "total_uncertainty", "coverage_uncertainty", "ensemble_uncertainty")
+summary(Cowtan_Way)
+```
+
+## Interactive Plot
+
+```{r temperature change, echo = FALSE}
+shinyApp(
+  ui = fluidPage(
+
+    # Application title
+    titlePanel("Change in global temperature using the Cowtan-Way global temperature data set"),
+
+    # Sidebar with start and end years between 1850 and 2020
+    sidebarLayout(
+        sidebarPanel(
+            numericInput("startdate", "Start Year", 1850, min = 1850),
+            numericInput("enddate", "End Year", 2020, min = 1851)
+        ),
+
+        # Time series graph with regression line
+        mainPanel(
+            h3("Trend per 100 years (ºC)"),
+            textOutput("trend"),
+            h3("Change in global temperature over time"),
+            plotlyOutput("tempPlot")
+        )
+    )
+),
+
+server = function(input, output) {
+    
+    # Data set of average annual global temperature
+    
+    Cowtan_Way <- read.table("https://www-users.york.ac.uk/~kdc3/papers/coverage2013/had4_krig_annual_v2_0_0.txt", header = FALSE)
+    names(Cowtan_Way) <- c("year", "temperature", "total_uncertainty", "coverage_uncertainty", "ensemble_uncertainty")
+
+    # Create graph of temperature data and linear regression fit
+    
+    output$tempPlot <- renderPlotly({
+        CW <- subset(Cowtan_Way, year >= input$startdate & year <= input$enddate)
+        fit <- lm(temperature~year, data = CW)
+        xlab <- list(title = "Year")
+        ylab <- list(title = "Temperature Anomaly (ºC)")
+        plot_ly(CW, x = ~year, y = ~temperature, type = "scatter", mode = "lines", name = "Temperature") %>%
+            layout(xaxis = xlab, yaxis = ylab) %>%
+            add_lines(x = ~year, y = fitted(fit), name = "Trend")
+    })
+    output$trend <- renderText({
+        CW <- subset(Cowtan_Way, year >= input$startdate & year <= input$enddate)
+        fit <- lm(temperature~year, data = CW)
+        100*fit$coefficients[2]
+    })
+}
+)
+
+```
+
+## Example trends
+
+- +0.57ºC rise between 1850 and 2020
+- +0.87ºC rise between 1920 and 2020
+- +1.86ºC rise between 1970 and 2020
+- +2.02ºC rise between 1990 and 2020
+
+## Conclusions
+
+- Rate of temperature change has accelerated in recent decades, especially since 1970.
+- Before 1970, global average temperature fluctuated.
+- Full app published online at <https://jrmilks.shinyapps.io/global_temperature_trend/>
