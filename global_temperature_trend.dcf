@@ -1,0 +1,13 @@
+name: global_temperature_trend
+title: global_temperature_trend
+username:
+account: jrmilks
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4140062
+bundleId: 4604912
+url: https://jrmilks.shinyapps.io/global_temperature_trend/
+when: 1621202127.1136
+lastSyncTime: 1621202127.11362
+asMultiple: FALSE
+asStatic: FALSE
